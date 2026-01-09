@@ -42,7 +42,6 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   }
   // Otherwise return a list of recipes accessible to the household
-  const url = new URL(request.url);
   const query = url.searchParams.get('q')?.toLowerCase() ?? '';
   const diet = url.searchParams.get('diet');
   const cuisine = url.searchParams.get('cuisine');

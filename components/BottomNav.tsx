@@ -2,14 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HomeIcon, BookOpenIcon, CalendarIcon, ClipboardListIcon, ShoppingCartIcon, HeartIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import {
+  HomeIcon,
+  BookOpenIcon,
+  CalendarIcon,
+  ClipboardIcon,
+  ShoppingCartIcon,
+  HeartIcon,
+  ChartBarIcon,
+} from '@heroicons/react/24/outline';
 
 const navItems = [
   { href: '/', label: 'Feed', icon: BookOpenIcon },
   { href: '/recipes', label: 'Recipes', icon: HomeIcon },
   { href: '/meal-plan', label: 'Plan', icon: CalendarIcon },
   { href: '/grocery', label: 'Grocery', icon: ShoppingCartIcon },
-  { href: '/inventory', label: 'Inventory', icon: ClipboardListIcon },
+  { href: '/inventory', label: 'Inventory', icon: ClipboardIcon },
   { href: '/favorites', label: 'Favorites', icon: HeartIcon },
   { href: '/nutrition', label: 'Nutrition', icon: ChartBarIcon },
 ];
