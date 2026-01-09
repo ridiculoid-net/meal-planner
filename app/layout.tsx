@@ -1,14 +1,13 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import Providers from '@/components/Providers';
-import BottomNav from '@/components/BottomNav';
+import type { Metadata } from "next";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] });
+import Providers from "@/components/Providers";
+import BottomNav from "@/components/BottomNav";
+import AuthWidget from "@/components/AuthWidget";
 
 export const metadata: Metadata = {
-  title: 'Recipe Planner',
-  description: 'Personalized recipe, meal planning, grocery and inventory app',
+  title: "Meal Planner",
+  description: "Personalized meal planning and groceries",
 };
 
 export default function RootLayout({
@@ -17,17 +16,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${inter.className} h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50`}> 
+    <html lang="en">
+      <body>
         <Providers>
-          <div className="min-h-screen pb-16 flex flex-col">
-            {/* Main content */}
-            <div className="flex-1">
-              {children}
-            </div>
-            {/* Bottom navigation */}
-            <BottomNav />
-          </div>
+          {/* TOP APP BAR */}
+          <header className="sticky top-0 z-40 flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="font-semibold">Meal Planner</div>
+
+            {/* 🔑 AUTH WIDGET GOES HERE */}
+            <AuthWidget />
+          </header>
+
+          {/* MAIN CONTENT */}
+          <main className="pb-16">{children}</main>
+
+          {/* BOTTOM NAV */}
+          <BottomNav />
         </Providers>
       </body>
     </html>
