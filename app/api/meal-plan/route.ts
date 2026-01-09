@@ -88,6 +88,7 @@ export async function POST(request: Request) {
         slot,
         servings: servings ?? 1,
         usesLeftovers: usesLeftovers ?? false,
+	userId: session.user.id,
       },
       include: {
         recipe: true,
