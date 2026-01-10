@@ -2,8 +2,8 @@
 
 // Datasource definition. Supabase uses PostgreSQL
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Generate the Prisma client
@@ -53,100 +53,100 @@ enum GroceryStatus {
 /// User account created via NextAuth.
 /// Users can belong to multiple households via HouseholdMember.
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String        @id @default(uuid())
+  email     String        @unique
   name      String?
   image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   // Relationships
-  profile       UserProfile?
-  households    HouseholdMember[]
-  reactions     RecipeReaction[]
+  profile   UserProfile?
+  households HouseholdMember[]
+  reactions RecipeReaction[]
   mealPlanItems MealPlanItem[]
-  bookmarks     RecipeBookmark[]
-  reviews       RecipeReview[]
+  bookmarks RecipeBookmark[]
+  reviews   RecipeReview[]
 }
 
 model Household {
-  id        String   @id @default(uuid())
+  id        String         @id @default(uuid())
   name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  slug      String         @unique
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   // Relationships
-  members        HouseholdMember[]
-  recipes        Recipe[]
-  mealPlans      MealPlan[]
+  members   HouseholdMember[]
+  recipes   Recipe[]
+  mealPlans MealPlan[]
   inventoryItems InventoryItem[]
-  groceryLists   GroceryList[]
+  groceryLists GroceryList[]
 }
 
 model HouseholdMember {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   userId      String
   householdId String
-  role        String   @default("member")
-  joinedAt    DateTime @default(now())
+  role        String     @default("member")
+  joinedAt    DateTime   @default(now())
 
   // Relationships
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
 
   @@unique([userId, householdId])
 }
 
 /// Extended user data used for personalization (height, weight, diets, etc.).
 model UserProfile {
-  id                  String   @id @default(uuid())
-  userId              String   @unique
-  heightCm            Float?
-  weightKg            Float?
-  ageYears            Int?
-  householdSize       Int      @default(1)
-  goal                String? // maintain, lose, gain
-  activityLevel       String? // sedentary, light, moderate, active
+  id            String       @id @default(uuid())
+  userId        String       @unique
+  heightCm      Float?
+  weightKg      Float?
+  ageYears      Int?
+  householdSize Int          @default(1)
+  goal          String?      // maintain, lose, gain
+  activityLevel String?      // sedentary, light, moderate, active
   // store dietary preferences, allergies, favorite cuisines, meats, vegetables, dislikes as json arrays
-  diets               Json?
-  allergies           Json?
-  favoriteCuisines    Json?
-  favoriteMeats       Json?
-  favoriteVegetables  Json?
+  diets         Json?
+  allergies     Json?
+  favoriteCuisines Json?
+  favoriteMeats Json?
+  favoriteVegetables Json?
   dislikedIngredients Json?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   // Relationships
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Recipe {
-  id          String           @id @default(uuid())
+  id          String          @id @default(uuid())
   title       String
   description String?
   image       String?
-  servings    Float            @default(1)
+  servings    Float           @default(1)
   sourceType  RecipeSourceType
-  isGlobal    Boolean          @default(false)
-  attribution Json? // provider attribution details
-  householdId String? // null when global
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  tags        Json? // cuisines, diets, allergens, etc.
-  nutrition   Json? // computed nutrition information
+  isGlobal    Boolean         @default(false)
+  attribution Json?           // provider attribution details
+  householdId String?         // null when global
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  tags        Json?           // cuisines, diets, allergens, etc.
+  nutrition   Json?           // computed nutrition information
 
   // Relationships
-  household     Household?         @relation(fields: [householdId], references: [id])
-  ingredients   RecipeIngredient[]
-  steps         RecipeStep[]
-  reactions     RecipeReaction[]
+  household   Household?      @relation(fields: [householdId], references: [id])
+  ingredients RecipeIngredient[]
+  steps       RecipeStep[]
+  reactions   RecipeReaction[]
   mealPlanItems MealPlanItem[]
 
   // Additional relations
-  bookmarks RecipeBookmark[]
-  reviews   RecipeReview[]
+  bookmarks    RecipeBookmark[]
+  reviews      RecipeReview[]
 }
 
 model RecipeIngredient {
@@ -159,7 +159,7 @@ model RecipeIngredient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 }
 
 model RecipeStep {
@@ -170,110 +170,104 @@ model RecipeStep {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@unique([recipeId, order])
 }
 
 model RecipeReaction {
-  id        String       @id @default(uuid())
+  id        String      @id @default(uuid())
   userId    String
   recipeId  String
   type      ReactionType
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, recipeId])
 }
 
 /// Bookmark a recipe for later. Each user can bookmark a recipe once.
 model RecipeBookmark {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
   recipeId  String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   // Relationships
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, recipeId])
 }
 
 /// User-submitted review for a recipe, including rating (1–5) and optional comment.
 model RecipeReview {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
   recipeId  String
   rating    Float
   comment   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Relationships
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 }
 
 model MealPlan {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   householdId String
   startDate   DateTime
   endDate     DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  household Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  items     MealPlanItem[]
-}
-
-model MealPlanItem {
-  id         String   @id @default(uuid())
-  mealPlanId String
-  recipeId   String
-  date       DateTime
-  slot       String
-  servings   Float    @default(1)
-  leftovers  Boolean  @default(false)
-
-  // ADD THESE:
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
-  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-
-  @@index([mealPlanId])
-  @@index([recipeId])
-  @@index([userId]) // ADD
-}
-
-model InventoryItem {
-  id             String            @id @default(uuid())
-  householdId    String
-  name           String
-  quantity       Float
-  unit           String
-  location       InventoryLocation
-  expirationDate DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-
-  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
-}
-
-model GroceryList {
-  id          String        @id @default(uuid())
-  householdId String
-  status      GroceryStatus @default(active)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  household Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  items     GroceryListItem[]
+  household   Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  items       MealPlanItem[]
+}
+
+model MealPlanItem {
+  id          String     @id @default(uuid())
+  mealPlanId  String
+  recipeId    String
+  date        DateTime
+  slot        MealSlot
+  servings    Float       @default(1)
+  usesLeftovers Boolean   @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  mealPlan    MealPlan   @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe      Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model InventoryItem {
+  id           String           @id @default(uuid())
+  householdId  String
+  name         String
+  quantity     Float
+  unit         String
+  location     InventoryLocation
+  expirationDate DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  household    Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+}
+
+model GroceryList {
+  id           String         @id @default(uuid())
+  householdId  String
+  status       GroceryStatus  @default(active)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  household    Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  items        GroceryListItem[]
 }
 
 model GroceryListItem {
@@ -287,5 +281,5 @@ model GroceryListItem {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  groceryList GroceryList @relation(fields: [groceryListId], references: [id], onDelete: Cascade)
+  groceryList   GroceryList    @relation(fields: [groceryListId], references: [id], onDelete: Cascade)
 }

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { redirect } from 'next/navigation';
 
 async function fetchBookmarks() {
   const res = await fetch('/api/bookmarks');
@@ -24,9 +23,6 @@ async function toggleBookmark({ recipeId }: { recipeId: string }) {
 export default function FavoritesPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
   const queryClient = useQueryClient();
   const { data, error, isLoading } = useQuery({ queryKey: ['bookmarks'], queryFn: fetchBookmarks });
   const mutation = useMutation({

@@ -6,11 +6,12 @@ import { NextResponse } from 'next/server';
 // Fetch all recipes accessible to the user's household
 export async function GET(request: Request) {
   const session = await getServerSession(authConfig);
-  if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
-  }
-  const membership = await prisma.householdMember.findFirst({ where: { userId: session.user.id } });
-  const householdId = membership?.householdId;
+  const userId = session?.user?.id;
+  const membership = userId
+    ? await prisma.householdMember.findFirst({ where: { userId } })
+    : null;
+  const householdId = membership?.householdId ?? null;
+
   const url = new URL(request.url);
   const recipeId = url.searchParams.get('id');
   // If an id query param is provided, fetch a single recipe
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
     where: {
       OR: [
         { isGlobal: true },
-        { householdId: householdId },
+        ...(householdId ? [{ householdId }] : []),
       ],
       AND: query
         ? {

@@ -7,7 +7,8 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   const session = await getServerSession(authConfig);
   if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
+    // Anonymous visitors can browse the UI; bookmarks are simply empty.
+    return NextResponse.json([]);
   }
   const userId = session.user.id;
   const bookmarks = await prisma.recipeBookmark.findMany({

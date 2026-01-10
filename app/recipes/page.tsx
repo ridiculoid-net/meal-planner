@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 
 async function fetchRecipes(params: { q?: string; diet?: string; cuisine?: string }) {
@@ -19,9 +19,7 @@ async function fetchRecipes(params: { q?: string; diet?: string; cuisine?: strin
 export default function RecipesPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
+  const isAuthed = !!session;
   const [search, setSearch] = useState('');
   const [diet, setDiet] = useState('');
   const [cuisine, setCuisine] = useState('');
@@ -61,7 +59,16 @@ export default function RecipesPage() {
         </div>
       </div>
       <div className="mb-4">
-        <Link href="/recipes/new" className="px-3 py-2 bg-green-600 text-white rounded-md">Create Custom Recipe</Link>
+        {isAuthed ? (
+          <Link href="/recipes/new" className="px-3 py-2 bg-green-600 text-white rounded-md">Create Custom Recipe</Link>
+        ) : (
+          <button
+            onClick={() => signIn('google')}
+            className="px-3 py-2 bg-zinc-800 text-white rounded-md"
+          >
+            Sign in to create
+          </button>
+        )}
       </div>
       {isLoading && <p>Loading...</p>}
       {error && <p className="text-red-500">Error loading recipes</p>}

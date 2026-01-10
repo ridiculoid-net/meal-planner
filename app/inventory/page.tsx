@@ -2,7 +2,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 import { useState } from 'react';
 
 async function fetchInventory() {
@@ -14,9 +13,6 @@ async function fetchInventory() {
 export default function InventoryPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
   const { data, error, isLoading } = useQuery({ queryKey: ['inventory'], queryFn: fetchInventory });
   return (
     <main className="p-4">

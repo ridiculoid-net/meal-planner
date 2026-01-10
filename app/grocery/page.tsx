@@ -2,7 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 
 async function fetchGroceryList() {
   const res = await fetch('/api/grocery');
@@ -23,9 +22,6 @@ async function addItem(item: any) {
 export default function GroceryPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
   const queryClient = useQueryClient();
   const { data, error, isLoading } = useQuery({ queryKey: ['grocery'], queryFn: fetchGroceryList });
   const mutation = useMutation({

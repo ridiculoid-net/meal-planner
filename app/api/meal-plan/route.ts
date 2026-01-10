@@ -19,7 +19,7 @@ function getWeekRange(date: Date) {
 export async function GET(request: Request) {
   const session = await getServerSession(authConfig);
   if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
+    return NextResponse.json([]);
   }
   const membership = await prisma.householdMember.findFirst({ where: { userId: session.user.id } });
   if (!membership) {
@@ -88,7 +88,6 @@ export async function POST(request: Request) {
         slot,
         servings: servings ?? 1,
         usesLeftovers: usesLeftovers ?? false,
-	userId: session.user.id,
       },
       include: {
         recipe: true,

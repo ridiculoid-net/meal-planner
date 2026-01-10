@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Providers from '@/components/Providers';
+import BottomNav from '@/components/BottomNav';
+import AuthWidget from '@/components/AuthWidget';
 
-import Providers from "@/components/Providers";
-import BottomNav from "@/components/BottomNav";
-import AuthWidget from "@/components/AuthWidget";
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Meal Planner",
-  description: "Personalized meal planning and groceries",
+  title: 'Recipe Planner',
+  description: 'Personalized recipe, meal planning, grocery and inventory app',
 };
 
 export default function RootLayout({
@@ -16,22 +18,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="h-full">
+      <body className={`${inter.className} h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50`}> 
         <Providers>
-          {/* TOP APP BAR */}
-          <header className="sticky top-0 z-40 flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="font-semibold">Meal Planner</div>
+          <div className="min-h-screen pb-16 flex flex-col">
+            {/* Top bar */}
+            <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur dark:border-zinc-800/70 dark:bg-zinc-950/80">
+              <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600" aria-hidden="true" />
+                  <div className="leading-tight">
+                    <div className="text-sm font-semibold">Meal Planner</div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400">Recipes • Plan • Grocery • Inventory</div>
+                  </div>
+                </div>
 
-            {/* 🔑 AUTH WIDGET GOES HERE */}
-            <AuthWidget />
-          </header>
+                <AuthWidget />
+              </div>
+            </header>
 
-          {/* MAIN CONTENT */}
-          <main className="pb-16">{children}</main>
-
-          {/* BOTTOM NAV */}
-          <BottomNav />
+            {/* Main content */}
+            <div className="flex-1">
+              {children}
+            </div>
+            {/* Bottom navigation */}
+            <BottomNav />
+          </div>
         </Providers>
       </body>
     </html>

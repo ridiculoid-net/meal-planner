@@ -6,7 +6,21 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const session = await getServerSession(authConfig);
   if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
+    // Anonymous visitors: return a simple global feed without personalization.
+    const recipes = await prisma.recipe.findMany({
+      where: { isGlobal: true },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: { ingredients: true, steps: true, reviews: true },
+    });
+    const result = recipes.map((recipe) => {
+      const reviews: any[] = (recipe.reviews as any) || [];
+      const avgRating = reviews.length
+        ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+        : 0;
+      return { ...recipe, avgRating, reviewCount: reviews.length };
+    });
+    return NextResponse.json(result);
   }
   const userId = session.user.id;
   const membership = await prisma.householdMember.findFirst({ where: { userId } });

@@ -2,7 +2,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 import { useState } from 'react';
 
 async function fetchMealPlan(date?: string) {
@@ -35,9 +34,6 @@ function formatDateISO(date: Date) {
 export default function MealPlanPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
   const queryClient = useQueryClient();
   const todayISO = formatDateISO(new Date());
   const { data: plan, error: planError, isLoading: planLoading } = useQuery({ queryKey: ['mealPlan', todayISO], queryFn: () => fetchMealPlan(todayISO) });

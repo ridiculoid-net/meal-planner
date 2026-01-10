@@ -1,8 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -40,9 +39,7 @@ async function toggleBookmark({ recipeId }: { recipeId: string }) {
 export default function FeedPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
+  const isAuthed = !!session?.user;
   const queryClient = useQueryClient();
   // State for search and filters
   const [search, setSearch] = useState('');
@@ -55,12 +52,24 @@ export default function FeedPage() {
   });
   const reactionMutation = useMutation({
     mutationFn: reactRecipe,
+    onMutate: async () => {
+      if (!isAuthed) {
+        await signIn('google');
+        throw new Error('Sign in required');
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feed'] });
     },
   });
   const mutationBookmark = useMutation({
     mutationFn: toggleBookmark,
+    onMutate: async () => {
+      if (!isAuthed) {
+        await signIn('google');
+        throw new Error('Sign in required');
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feed'] });
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
@@ -68,6 +77,11 @@ export default function FeedPage() {
   });
   return (
     <main className="p-4 pb-24">
+      {!isAuthed && (
+        <div className="mb-4 rounded-xl border border-zinc-200 bg-white/70 p-3 text-sm text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-200">
+          You are browsing in <span className="font-semibold">guest mode</span>. You can explore the app, but saving (likes, bookmarks, meal plans) requires sign-in.
+        </div>
+      )}
       <h1 className="text-2xl font-bold mb-4">Recipe Feed</h1>
       {/* Search and filter controls */}
       <div className="mb-4 space-y-2">

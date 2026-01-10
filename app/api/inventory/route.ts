@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   const session = await getServerSession(authConfig);
   if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
+    return NextResponse.json([]);
   }
   // find household membership of user
   const membership = await prisma.householdMember.findFirst({

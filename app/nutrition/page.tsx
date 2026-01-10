@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
 async function fetchNutrition() {
@@ -13,9 +12,6 @@ async function fetchNutrition() {
 export default function NutritionPage() {
   const { data: session, status } = useSession();
   if (status === 'loading') return null;
-  if (!session) {
-    redirect('/login');
-  }
   const { data, error, isLoading } = useQuery({ queryKey: ['nutrition'], queryFn: fetchNutrition });
   return (
     <main className="p-4 pb-24">
